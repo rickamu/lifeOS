@@ -1,5 +1,14 @@
 {
-  "tasks": [],
+  "tasks": [
+    {
+      "id": "32jxkdt",
+      "text": "Get fafsa entries from Trump",
+      "priority": "Medium",
+      "cat": "Work",
+      "done": false,
+      "created": "2026-04-28T21:50:19.120Z"
+    }
+  ],
   "habits": [
     {
       "id": "2f74mh0",
@@ -77,5 +86,5 @@
       "time": "2026-04-28T21:29:32.325Z"
     }
   },
-  "_saved": "2026-04-28T21:49:21.493Z"
+  "_saved": "2026-04-28T21:50:22.130Z"
 }
