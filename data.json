@@ -1,0 +1,81 @@
+{
+  "tasks": [],
+  "habits": [
+    {
+      "id": "2f74mh0",
+      "name": "Drink 2L water",
+      "emoji": "💧",
+      "color": "var(--green)"
+    },
+    {
+      "id": "58ur2rg",
+      "name": "Meditate",
+      "emoji": "🧘",
+      "color": "var(--purple)"
+    },
+    {
+      "id": "f81y6ra",
+      "name": "Exercise",
+      "emoji": "🏃",
+      "color": "var(--coral)"
+    },
+    {
+      "id": "88dxtlo",
+      "name": "No screens 9pm",
+      "emoji": "📵",
+      "color": "var(--pink)"
+    }
+  ],
+  "goals": [
+    {
+      "id": "gnuvl28",
+      "name": "Run 5K race",
+      "cat": "Health",
+      "pct": 72,
+      "deadline": "2026-06-30",
+      "why": "Build discipline and fitness"
+    },
+    {
+      "id": "ztlnaqy",
+      "name": "Build side project",
+      "cat": "Career",
+      "pct": 45,
+      "deadline": "2026-08-31",
+      "why": "Create something meaningful"
+    },
+    {
+      "id": "h4tg162",
+      "name": "Read 12 books",
+      "cat": "Learning",
+      "pct": 58,
+      "deadline": "2026-12-31",
+      "why": "Expand my perspective"
+    },
+    {
+      "id": "a8yvsnz",
+      "name": "Save KSh 100k",
+      "cat": "Finance",
+      "pct": 31,
+      "deadline": "2026-12-31",
+      "why": "Financial freedom"
+    }
+  ],
+  "finance": [],
+  "journal": [
+    {
+      "id": "j4u9grs",
+      "date": "2026-04-28",
+      "text": "Today I have managed o set my life OS up and running on Git. Baby steps but firs step to the beginning of an amazing life. Get better ",
+      "mood": "Great"
+    }
+  ],
+  "habitLogs": {},
+  "workLogs": {
+    "2026-04-28": {
+      "answered": true,
+      "reported": false,
+      "time": "2026-04-28T21:29:32.325Z"
+    }
+  },
+  "_saved": "2026-04-28T21:49:06.392Z"
+}
