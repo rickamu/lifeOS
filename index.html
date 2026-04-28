@@ -458,7 +458,68 @@
   }
   .modal textarea { min-height: 80px; resize: none; }
   .modal input:focus, .modal select:focus, .modal textarea:focus { border-color: var(--coral); }
-  .modal-btns { display: flex; gap: 10px; justify-content: flex-end; margin-top: 4px; }
+  /* ══════════════════════════════════════
+     WORK LOG CALENDAR
+  ══════════════════════════════════════ */
+  .wl-day-headers {
+    display: grid; grid-template-columns: repeat(7, 1fr);
+    gap: 4px; margin-bottom: 6px;
+  }
+  .wl-day-hdr {
+    text-align: center; font-size: 11px; font-weight: 600;
+    letter-spacing: 0.8px; text-transform: uppercase;
+    color: var(--muted); padding: 6px 0;
+  }
+  .wl-grid {
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px;
+  }
+  .wl-cell {
+    aspect-ratio: 1; border-radius: 10px; border: 1.5px solid var(--border);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.15s; position: relative; overflow: hidden;
+    background: var(--card);
+  }
+  .wl-cell:hover { transform: scale(1.05); box-shadow: 0 4px 14px rgba(0,0,0,0.1); z-index: 2; }
+  .wl-cell.wl-empty { background: transparent; border-color: transparent; cursor: default; pointer-events: none; }
+  .wl-cell.wl-empty:hover { transform: none; }
+  .wl-cell.wl-today { box-shadow: 0 0 0 2.5px var(--amber); }
+  .wl-cell.wl-worked { background: #EDFAF4; border-color: #A8DFC8; }
+  .wl-cell.wl-off    { background: #FEF0EE; border-color: #F5C0B5; }
+  .wl-cell.wl-future { background: var(--bg); border-color: var(--border); cursor: default; opacity: 0.5; }
+  .wl-cell.wl-future:hover { transform: none; }
+  .wl-day-num {
+    font-size: 13px; font-weight: 600; line-height: 1;
+  }
+  .wl-cell.wl-worked .wl-day-num { color: #0F7A4E; }
+  .wl-cell.wl-off    .wl-day-num { color: #B03A2B; }
+  .wl-cell.wl-today  .wl-day-num { color: var(--amber); }
+  .wl-dot {
+    width: 6px; height: 6px; border-radius: 50%; margin-top: 4px;
+  }
+  .wl-cell.wl-worked .wl-dot { background: var(--green); }
+  .wl-cell.wl-off    .wl-dot { background: var(--coral); }
+  .wl-cell-icon { font-size: 14px; margin-top: 2px; }
+
+  .wl-detail {
+    background: var(--card); border-radius: var(--rad);
+    border: 1px solid var(--border); padding: 22px 26px;
+    box-shadow: var(--shadow); animation: slideDown 0.25s ease;
+  }
+  .wl-detail-header {
+    display: flex; align-items: center; gap: 16px; margin-bottom: 16px;
+  }
+  .wl-detail-badge {
+    width: 48px; height: 48px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
+  }
+  .wl-detail-date { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 600; }
+  .wl-detail-status { font-size: 12px; font-weight: 600; margin-top: 2px; }
+  .wl-detail-body { font-size: 14px; line-height: 1.75; color: var(--sub); white-space: pre-wrap; }
+  .wl-detail-empty { font-size: 13px; color: var(--muted); font-style: italic; }
+
+  .wl-legend { display: flex; gap: 20px; align-items: center; margin-top: 14px; flex-wrap: wrap; }
+  .wl-legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--sub); }
+  .wl-legend-dot { width: 12px; height: 12px; border-radius: 3px; }
 </style>
 </head>
 <body>
@@ -472,6 +533,7 @@
   <a class="nav-item" onclick="showSection('goals')"><span class="nav-icon">🎯</span> Goals</a>
   <a class="nav-item" onclick="showSection('finance')"><span class="nav-icon">💰</span> Finance</a>
   <a class="nav-item" onclick="showSection('journal')"><span class="nav-icon">📓</span> Journal</a>
+  <a class="nav-item" onclick="showSection('worklog')"><span class="nav-icon">💼</span> Work Log</a>
   <div style="margin-top:auto;padding:0 16px 12px;">
     <button onclick="openSyncModal()" style="width:100%;padding:9px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.7);font-family:'DM Sans',sans-serif;font-size:12.5px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
       <span id="sync-dot" style="width:8px;height:8px;border-radius:50%;background:#9A9690;flex-shrink:0;transition:background 0.3s"></span>
@@ -526,7 +588,7 @@
       <div class="home-quote" id="daily-quote"></div>
     </div>
 
-    <div class="grid-3" id="home-stats">
+    <div class="grid-3" id="home-stats" style="grid-template-columns:1fr 1fr 1fr 1fr;">
       <div class="card">
         <div class="card-stripe" style="background:var(--coral)"></div>
         <div class="card-label">Tasks Remaining</div>
@@ -544,6 +606,12 @@
         <div class="card-label">Spent This Month</div>
         <div class="stat-big" style="color:var(--amber)" id="home-finance-total">KSh 0</div>
         <div class="stat-sub">this month</div>
+      </div>
+      <div class="card" style="cursor:pointer" onclick="showSection('worklog')">
+        <div class="card-stripe" style="background:var(--purple)"></div>
+        <div class="card-label">Attendance</div>
+        <div class="stat-big" style="color:var(--purple)" id="home-attendance-rate">0<span style="font-size:18px;color:var(--muted)">%</span></div>
+        <div class="stat-sub" id="home-attendance-sub">0 worked · 0 off</div>
       </div>
     </div>
 
@@ -717,6 +785,31 @@
         </div>
       </div>
     </div>
+  </div>
+  <!-- ══ WORK LOG ══ -->
+  <div class="section" id="sec-worklog">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Work Log</div>
+        <div class="page-sub" id="worklog-sub">Your attendance calendar</div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <button class="btn-ghost" onclick="wlPrevMonth()">← Prev</button>
+        <span id="wl-month-label" style="font-weight:600;font-size:15px;min-width:140px;text-align:center"></span>
+        <button class="btn-ghost" onclick="wlNextMonth()">Next →</button>
+      </div>
+    </div>
+
+    <!-- Stats row -->
+    <div class="grid-3" id="wl-stats" style="margin-bottom:24px;"></div>
+
+    <!-- Calendar grid -->
+    <div class="card" style="margin-bottom:24px;">
+      <div id="wl-calendar"></div>
+    </div>
+
+    <!-- Detail panel — shown when a day is clicked -->
+    <div id="wl-detail-panel" style="display:none"></div>
   </div>
 
 </main>
@@ -966,6 +1059,7 @@ function showSection(id) {
   if (id === 'goals') renderGoals();
   if (id === 'finance') renderFinance();
   if (id === 'journal') renderJournal();
+  if (id === 'worklog') renderWorkLog();
 }
 
 // ══════════════════════════════════════
@@ -1150,6 +1244,22 @@ function renderHome() {
     document.getElementById('home-mood-emoji').textContent = MOOD_EMOJIS[todayEntry.mood];
     document.getElementById('home-mood-label').textContent = todayEntry.mood;
   }
+
+  // attendance this month
+  const mk2 = monthKey();
+  const now2 = new Date();
+  const daysInMonth2 = new Date(now2.getFullYear(), now2.getMonth() + 1, 0).getDate();
+  let attWorked = 0, attOff = 0, attTotal = 0;
+  for (let d = 1; d <= daysInMonth2; d++) {
+    const key = `${mk2}-${String(d).padStart(2, '0')}`;
+    if (key > today) break;
+    attTotal++;
+    const wl = workLogs[key];
+    if (wl && wl.answered) { if (wl.reported) attWorked++; else attOff++; }
+  }
+  const attRate = attTotal > 0 ? Math.round((attWorked / attTotal) * 100) : 0;
+  document.getElementById('home-attendance-rate').innerHTML = `${attRate}<span style="font-size:18px;color:var(--muted)">%</span>`;
+  document.getElementById('home-attendance-sub').textContent = `${attWorked} worked · ${attOff} off`;
 
   // goals preview
   const gl = document.getElementById('home-goals-list');
@@ -1546,6 +1656,175 @@ function renderJournal() {
       </div>
       <div class="journal-entry-text">${j.text ? j.text.slice(0, 160) + (j.text.length > 160 ? '…' : '') : '<em style="color:var(--muted)">No text</em>'}</div>
     </div>`).join('');
+}
+
+// ══════════════════════════════════════
+// WORK LOG CALENDAR
+// ══════════════════════════════════════
+let wlViewYear  = new Date().getFullYear();
+let wlViewMonth = new Date().getMonth(); // 0-indexed
+
+const WL_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const WL_DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+function wlPrevMonth() {
+  wlViewMonth--;
+  if (wlViewMonth < 0) { wlViewMonth = 11; wlViewYear--; }
+  renderWorkLog();
+}
+function wlNextMonth() {
+  wlViewMonth++;
+  if (wlViewMonth > 11) { wlViewMonth = 0; wlViewYear++; }
+  renderWorkLog();
+}
+
+function renderWorkLog() {
+  // ── month label ──
+  document.getElementById('wl-month-label').textContent = `${WL_MONTHS[wlViewMonth]} ${wlViewYear}`;
+
+  const today = todayKey();
+  const year  = wlViewYear;
+  const month = wlViewMonth;
+
+  // Days in this month
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  // What weekday does the 1st fall on? (0=Sun)
+  const firstDow = new Date(year, month, 1).getDay();
+
+  // ── Stats ──
+  const monthPrefix = `${year}-${String(month + 1).padStart(2, '0')}`;
+  let worked = 0, offDay = 0, total = 0;
+  for (let d = 1; d <= daysInMonth; d++) {
+    const key = `${monthPrefix}-${String(d).padStart(2, '0')}`;
+    if (key > today) break;
+    total++;
+    const log = workLogs[key];
+    if (log && log.answered) {
+      if (log.reported) worked++;
+      else offDay++;
+    }
+  }
+  const unanswered = total - worked - offDay;
+
+  document.getElementById('wl-stats').innerHTML = `
+    <div class="card">
+      <div class="card-stripe" style="background:var(--green)"></div>
+      <div class="card-label">Days Worked</div>
+      <div class="stat-big" style="color:var(--green)">${worked}</div>
+      <div class="stat-sub">this month</div>
+    </div>
+    <div class="card">
+      <div class="card-stripe" style="background:var(--coral)"></div>
+      <div class="card-label">Days Off</div>
+      <div class="stat-big" style="color:var(--coral)">${offDay}</div>
+      <div class="stat-sub">this month</div>
+    </div>
+    <div class="card">
+      <div class="card-stripe" style="background:var(--amber)"></div>
+      <div class="card-label">Attendance Rate</div>
+      <div class="stat-big" style="color:var(--amber)">${total > 0 ? Math.round((worked / total) * 100) : 0}<span style="font-size:18px;color:var(--muted)">%</span></div>
+      <div class="stat-sub">${unanswered} day${unanswered !== 1 ? 's' : ''} not logged</div>
+    </div>`;
+
+  // ── Calendar ──
+  const calEl = document.getElementById('wl-calendar');
+  let html = `
+    <div class="wl-day-headers">
+      ${WL_DAYS.map(d => `<div class="wl-day-hdr">${d}</div>`).join('')}
+    </div>
+    <div class="wl-grid">`;
+
+  // Empty cells before the 1st
+  for (let i = 0; i < firstDow; i++) {
+    html += `<div class="wl-cell wl-empty"></div>`;
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const key    = `${monthPrefix}-${String(d).padStart(2, '0')}`;
+    const log    = workLogs[key];
+    const isToday   = key === today;
+    const isFuture  = key > today;
+    const answered  = log && log.answered;
+    const worked_d  = answered && log.reported;
+    const off_d     = answered && !log.reported;
+
+    let cls = 'wl-cell';
+    if (isFuture)  cls += ' wl-future';
+    else if (worked_d) cls += ' wl-worked';
+    else if (off_d)    cls += ' wl-off';
+    if (isToday)   cls += ' wl-today';
+
+    const icon = worked_d ? '💼' : off_d ? '🏖️' : isFuture ? '' : '·';
+    const dot  = (worked_d || off_d) ? `<div class="wl-dot"></div>` : '';
+
+    html += `
+      <div class="${cls}" onclick="wlShowDetail('${key}')" title="${key}">
+        <span class="wl-day-num">${d}</span>
+        <span class="wl-cell-icon">${icon}</span>
+        ${dot}
+      </div>`;
+  }
+
+  html += `</div>
+    <div class="wl-legend">
+      <div class="wl-legend-item"><div class="wl-legend-dot" style="background:#EDFAF4;border:1.5px solid #A8DFC8"></div> Worked</div>
+      <div class="wl-legend-item"><div class="wl-legend-dot" style="background:#FEF0EE;border:1.5px solid #F5C0B5"></div> Day off</div>
+      <div class="wl-legend-item"><div class="wl-legend-dot" style="background:var(--card);border:1.5px solid var(--border)"></div> Not logged</div>
+      <div class="wl-legend-item"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;box-shadow:0 0 0 2.5px #C07B10"></span> Today</div>
+    </div>`;
+
+  calEl.innerHTML = html;
+}
+
+function wlShowDetail(key) {
+  const panel = document.getElementById('wl-detail-panel');
+  const log   = workLogs[key];
+
+  if (!log || !log.answered) {
+    const today = todayKey();
+    if (key > today) { panel.style.display = 'none'; return; }
+    // Not logged — show a note
+    panel.style.display = 'block';
+    const d = new Date(key + 'T12:00:00');
+    panel.innerHTML = `
+      <div class="wl-detail">
+        <div class="wl-detail-header">
+          <div class="wl-detail-badge" style="background:#F5F4F0">📅</div>
+          <div>
+            <div class="wl-detail-date">${d.toLocaleDateString('en-KE',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
+            <div class="wl-detail-status" style="color:var(--muted)">Not logged</div>
+          </div>
+        </div>
+        <div class="wl-detail-empty">No entry recorded for this day.</div>
+      </div>`;
+    return;
+  }
+
+  panel.style.display = 'block';
+  const d = new Date(key + 'T12:00:00');
+  const isWorked = log.reported;
+
+  panel.innerHTML = `
+    <div class="wl-detail">
+      <div class="wl-detail-header">
+        <div class="wl-detail-badge" style="background:${isWorked ? '#EDFAF4' : '#FEF0EE'}">
+          ${isWorked ? '💼' : '🏖️'}
+        </div>
+        <div>
+          <div class="wl-detail-date">${d.toLocaleDateString('en-KE',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
+          <div class="wl-detail-status" style="color:${isWorked ? 'var(--green)' : 'var(--coral)'}">
+            ${isWorked ? '✓ Reported to work' : '✗ Day off'}
+          </div>
+        </div>
+        <button onclick="document.getElementById('wl-detail-panel').style.display='none'" style="margin-left:auto;background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;padding:4px">×</button>
+      </div>
+      ${isWorked && log.summary
+        ? `<div class="card-label" style="margin-bottom:8px">What was done</div>
+           <div class="wl-detail-body">${log.summary}</div>`
+        : `<div class="wl-detail-empty">${isWorked ? 'No activities recorded.' : 'Enjoy your day off! 🌴'}</div>`
+      }
+      ${log.time ? `<div style="margin-top:14px;font-size:11px;color:var(--muted)">Logged at ${new Date(log.time).toLocaleTimeString('en-KE',{hour:'2-digit',minute:'2-digit'})}</div>` : ''}
+    </div>`;
 }
 
 // ══════════════════════════════════════
