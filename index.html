@@ -1115,11 +1115,14 @@ function initPage() {
   if (todayEntry) {
     document.getElementById('journal-text').value = todayEntry.text || '';
     if (todayEntry.mood) {
+      selectedMood = todayEntry.mood; // restore selectedMood so saves don't wipe it
+      const moodColors = { Rough:'#E57373', Low:'#FFB74D', Okay:'#FFD54F', Good:'#81C784', Great:'#4DB6AC' };
       document.querySelectorAll('.mood-opt').forEach(btn => {
         if (btn.dataset.mood === todayEntry.mood) {
           btn.classList.add('selected');
-          btn.style.background = btn.style.getPropertyValue('--mc') + '33';
-          btn.style.borderColor = btn.style.getPropertyValue('--mc');
+          const c = moodColors[todayEntry.mood] || '#aaa';
+          btn.style.borderColor = c;
+          btn.style.background  = c + '22';
         }
       });
     }
@@ -1608,54 +1611,86 @@ function selectMood(btn) {
 
 function onJournalType() {
   clearTimeout(journalSaveTimer);
-  journalSaveTimer = setTimeout(() => {
-    autoSaveJournal();
-  }, 1200);
+  journalSaveTimer = setTimeout(autoSaveJournal, 1200);
 }
 
 function autoSaveJournal() {
   const text = document.getElementById('journal-text').value;
+  // Save if there's any text OR a mood selected — don't bail on empty text alone
   if (!text.trim() && !selectedMood) return;
-  upsertJournalEntry(text, selectedMood);
-  const ind = document.getElementById('save-indicator');
-  ind.style.opacity = '1';
-  setTimeout(() => ind.style.opacity = '0', 2000);
+  upsertJournalEntry(text);
+  showSaveIndicator();
 }
 
 function saveJournalEntry() {
   const text = document.getElementById('journal-text').value;
-  upsertJournalEntry(text, selectedMood);
+  if (!text.trim() && !selectedMood) {
+    showSaveIndicator('Nothing to save yet');
+    return;
+  }
+  upsertJournalEntry(text);
+
+  // Clear the textarea and reset mood after saving
+  document.getElementById('journal-text').value = '';
+  document.querySelectorAll('.mood-opt').forEach(b => {
+    b.classList.remove('selected');
+    b.style.background = '';
+    b.style.borderColor = '';
+  });
+  selectedMood = null;
+
+  // Immediately re-render past entries and home
   renderJournal();
   renderHome();
+  showSaveIndicator('Entry saved ✓');
+}
+
+function showSaveIndicator(msg) {
   const ind = document.getElementById('save-indicator');
+  ind.textContent = msg || 'Saved ✓';
+  ind.style.color = msg ? 'var(--muted)' : 'var(--green)';
   ind.style.opacity = '1';
   setTimeout(() => ind.style.opacity = '0', 2000);
 }
 
-function upsertJournalEntry(text, mood) {
+function upsertJournalEntry(text) {
   const today = todayKey();
   const idx = journal.findIndex(j => j.date === today);
-  const entry = { id: idx >= 0 ? journal[idx].id : uid(), date: today, text, mood };
+  // Only update mood if the user has actively selected one this session
+  // Otherwise keep the previously saved mood intact
+  const existingMood = idx >= 0 ? journal[idx].mood : null;
+  const moodToSave = selectedMood !== null ? selectedMood : existingMood;
+  const entry = {
+    id: idx >= 0 ? journal[idx].id : uid(),
+    date: today,
+    text,
+    mood: moodToSave
+  };
   if (idx >= 0) journal[idx] = entry;
   else journal.unshift(entry);
-  save();
+  save(); // save() now also calls scheduleSyncPush via the updated save()
 }
 
 function renderJournal() {
   const hist = document.getElementById('journal-history');
-  const past = journal.filter(j => j.date !== todayKey()).slice(0, 10);
-  if (past.length === 0) {
-    hist.innerHTML = `<div class="empty-state" style="padding:20px"><div class="empty-icon">📓</div>Past entries will appear here.</div>`;
+  // Show all saved entries, most recent first — including today's once saved
+  const entries = [...journal].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 15);
+  if (entries.length === 0) {
+    hist.innerHTML = `<div class="empty-state" style="padding:20px"><div class="empty-icon">📓</div>Past entries will appear here after you save.</div>`;
     return;
   }
-  hist.innerHTML = past.map(j => `
-    <div class="journal-entry">
+  const today = todayKey();
+  hist.innerHTML = entries.map(j => {
+    const isToday = j.date === today;
+    return `
+    <div class="journal-entry" style="${isToday ? 'border-color:var(--pink);border-width:1.5px' : ''}">
       <div class="journal-entry-header">
-        <span class="journal-entry-date">${j.date}</span>
+        <span class="journal-entry-date" style="${isToday ? 'color:var(--pink);font-weight:600' : ''}">${isToday ? 'Today · ' : ''}${j.date}</span>
         <span class="journal-entry-mood">${j.mood ? MOOD_EMOJIS[j.mood] : '—'}</span>
       </div>
-      <div class="journal-entry-text">${j.text ? j.text.slice(0, 160) + (j.text.length > 160 ? '…' : '') : '<em style="color:var(--muted)">No text</em>'}</div>
-    </div>`).join('');
+      <div class="journal-entry-text">${j.text ? j.text.slice(0, 160) + (j.text.length > 160 ? '…' : '') : '<em style="color:var(--muted)">Mood only</em>'}</div>
+    </div>`;
+  }).join('');
 }
 
 // ══════════════════════════════════════
@@ -1842,14 +1877,20 @@ if (GH.token && GH.repo && GH.owner) {
   syncPull().then(() => {
     // Re-init journal prompt after pull
     const te = journal.find(j => j.date === todayKey());
-    if (te && te.mood) {
-      document.querySelectorAll('.mood-opt').forEach(btn => {
-        if (btn.dataset.mood === te.mood) {
-          btn.classList.add('selected');
-          btn.style.borderColor = btn.style.getPropertyValue('--mc');
-          btn.style.background  = btn.style.getPropertyValue('--mc') + '22';
-        }
-      });
+    if (te) {
+      document.getElementById('journal-text').value = te.text || '';
+      if (te.mood) {
+        selectedMood = te.mood;
+        const moodColors = { Rough:'#E57373', Low:'#FFB74D', Okay:'#FFD54F', Good:'#81C784', Great:'#4DB6AC' };
+        document.querySelectorAll('.mood-opt').forEach(btn => {
+          if (btn.dataset.mood === te.mood) {
+            btn.classList.add('selected');
+            const c = moodColors[te.mood] || '#aaa';
+            btn.style.borderColor = c;
+            btn.style.background  = c + '22';
+          }
+        });
+      }
     }
   });
 } else {
