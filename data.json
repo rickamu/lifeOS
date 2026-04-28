@@ -23,6 +23,14 @@
       "cat": "Personal",
       "done": false,
       "created": "2026-04-28T21:53:29.062Z"
+    },
+    {
+      "id": "8bm5v2x",
+      "text": "weeding",
+      "priority": "High",
+      "cat": "Personal",
+      "done": false,
+      "created": "2026-04-28T21:53:37.988Z"
     }
   ],
   "habits": [
@@ -102,5 +110,5 @@
       "time": "2026-04-28T21:29:32.325Z"
     }
   },
-  "_saved": "2026-04-28T21:53:32.076Z"
+  "_saved": "2026-04-28T21:53:40.995Z"
 }
