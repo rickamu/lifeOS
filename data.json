@@ -1,12 +1,12 @@
 {
   "tasks": [
     {
-      "id": "32jxkdt",
-      "text": "Get fafsa entries from Trump",
-      "priority": "Medium",
+      "id": "ul1z0jd",
+      "text": "Apply for a job",
+      "priority": "High",
       "cat": "Work",
       "done": false,
-      "created": "2026-04-28T21:50:19.120Z"
+      "created": "2026-04-28T21:50:32.518Z"
     }
   ],
   "habits": [
@@ -86,5 +86,5 @@
       "time": "2026-04-28T21:29:32.325Z"
     }
   },
-  "_saved": "2026-04-28T21:50:22.130Z"
+  "_saved": "2026-04-28T21:50:38.072Z"
 }
