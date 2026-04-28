@@ -754,26 +754,26 @@
         <div class="card" style="margin-bottom:16px;">
           <div class="card-label" style="margin-bottom:12px">How are you feeling today?</div>
           <div class="mood-row" id="mood-selector">
-            <button class="mood-opt" data-mood="Rough" data-score="1" onclick="selectMood(this)" style="--mc:#E57373">
+            <button class="mood-opt" data-mood="Rough" onclick="selectMood(this)" style="--mc:#E57373">
               <span class="mood-emoji">😞</span><span class="mood-label">Rough</span>
             </button>
-            <button class="mood-opt" data-mood="Low" data-score="2" onclick="selectMood(this)" style="--mc:#FFB74D">
+            <button class="mood-opt" data-mood="Low" onclick="selectMood(this)" style="--mc:#FFB74D">
               <span class="mood-emoji">😕</span><span class="mood-label">Low</span>
             </button>
-            <button class="mood-opt" data-mood="Okay" data-score="3" onclick="selectMood(this)" style="--mc:#FFD54F">
+            <button class="mood-opt" data-mood="Okay" onclick="selectMood(this)" style="--mc:#FFD54F">
               <span class="mood-emoji">😐</span><span class="mood-label">Okay</span>
             </button>
-            <button class="mood-opt" data-mood="Good" data-score="4" onclick="selectMood(this)" style="--mc:#81C784">
+            <button class="mood-opt" data-mood="Good" onclick="selectMood(this)" style="--mc:#81C784">
               <span class="mood-emoji">🙂</span><span class="mood-label">Good</span>
             </button>
-            <button class="mood-opt" data-mood="Great" data-score="5" onclick="selectMood(this)" style="--mc:#4DB6AC">
+            <button class="mood-opt" data-mood="Great" onclick="selectMood(this)" style="--mc:#4DB6AC">
               <span class="mood-emoji">😄</span><span class="mood-label">Great</span>
             </button>
           </div>
           <div class="journal-prompt" id="journal-prompt-text"></div>
-          <textarea class="journal-area" id="journal-text" placeholder="Start writing…" oninput="onJournalType()"></textarea>
+          <textarea class="journal-area" id="journal-text" placeholder="Start writing…"></textarea>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;">
-            <div class="save-indicator" id="save-indicator">Saved ✓</div>
+            <div id="save-indicator" style="font-size:12px;color:var(--green);opacity:0;transition:opacity 0.3s;font-weight:500;"></div>
             <button class="btn-primary" style="background:var(--pink)" onclick="saveJournalEntry()">Save Entry</button>
           </div>
         </div>
@@ -781,7 +781,7 @@
       <div>
         <div class="card">
           <div class="card-label" style="margin-bottom:14px">Past Entries</div>
-          <div id="journal-history"></div>
+          <div id="journal-history"><div style="text-align:center;padding:30px;color:var(--muted);font-size:13px"><div style="font-size:36px;margin-bottom:8px">📓</div>Entries appear here after saving.</div></div>
         </div>
       </div>
     </div>
