@@ -55,6 +55,14 @@
       "cat": "Finance",
       "done": false,
       "created": "2026-04-29T08:18:05.412Z"
+    },
+    {
+      "id": "0znnc6n",
+      "text": "buy laundry basket",
+      "priority": "Medium",
+      "cat": "Finance",
+      "done": false,
+      "created": "2026-04-29T08:18:20.938Z"
     }
   ],
   "habits": [
@@ -139,5 +147,5 @@
       "time": "2026-04-29T08:10:25.516Z"
     }
   },
-  "_saved": "2026-04-29T08:18:08.416Z"
+  "_saved": "2026-04-29T08:18:23.948Z"
 }
