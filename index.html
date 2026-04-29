@@ -520,6 +520,151 @@
   .wl-legend { display: flex; gap: 20px; align-items: center; margin-top: 14px; flex-wrap: wrap; }
   .wl-legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--sub); }
   .wl-legend-dot { width: 12px; height: 12px; border-radius: 3px; }
+
+  /* ══════════════════════════════════════
+     MOBILE BOTTOM TAB BAR
+  ══════════════════════════════════════ */
+  .bottom-nav {
+    display: none;
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--text);
+    z-index: 200;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .bottom-nav-inner {
+    display: flex; align-items: stretch;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .bottom-nav-inner::-webkit-scrollbar { display: none; }
+  .bn-item {
+    flex: 0 0 auto; min-width: 60px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 8px 6px 6px; gap: 3px;
+    color: rgba(255,255,255,0.45);
+    font-size: 9px; font-weight: 600; letter-spacing: 0.2px;
+    cursor: pointer; transition: all 0.15s;
+    border-top: 2.5px solid transparent;
+  }
+  .bn-item.active { color: #fff; border-top-color: var(--coral); }
+  .bn-icon { font-size: 19px; line-height: 1; }
+  .bn-sync {
+    flex: 0 0 auto; min-width: 52px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 8px 6px 6px; gap: 3px;
+    color: rgba(255,255,255,0.4);
+    font-size: 9px; font-weight: 600;
+    cursor: pointer; border-top: 2.5px solid transparent;
+  }
+
+  /* ══════════════════════════════════════
+     RESPONSIVE
+  ══════════════════════════════════════ */
+  @media (max-width: 768px) {
+    .sidebar { display: none !important; }
+    .bottom-nav { display: block; }
+
+    .main {
+      margin-left: 0;
+      padding: 14px 12px 84px;
+      max-width: 100%;
+    }
+
+    .page-header {
+      flex-direction: column; align-items: flex-start;
+      gap: 10px; margin-bottom: 16px;
+    }
+    .page-title { font-size: 24px; }
+
+    /* Grids → single column */
+    .grid-3, .grid-2, .grid-21 { grid-template-columns: 1fr !important; gap: 10px; }
+
+    /* Home stats → 2 cols */
+    #home-stats { grid-template-columns: 1fr 1fr !important; gap: 10px; }
+    #home-stats .stat-big, #home-stats .tasks-count { font-size: 28px; }
+    #home-stats .card { padding: 14px 14px; }
+
+    /* Greeting */
+    .home-greeting { flex-direction: column; align-items: flex-start; gap: 8px; padding: 16px 16px; }
+    .home-greeting h2 { font-size: 20px; }
+    .home-quote { text-align: left; max-width: 100%; font-size: 12px; }
+
+    /* Cards */
+    .card { padding: 14px 14px; border-radius: 12px; }
+
+    /* Work check-in */
+    .work-checkin { padding: 16px 14px; }
+    .work-checkin-title { font-size: 15px; }
+    .work-yn { flex-direction: column; gap: 8px; }
+
+    /* Tasks */
+    .tasks-tabs { flex-wrap: wrap; gap: 5px; }
+    .tab-btn { font-size: 11px; padding: 5px 10px; }
+    .task-item { padding: 10px 12px; gap: 8px; }
+    .task-text { font-size: 13px; }
+
+    /* Habits */
+    .habit-card { padding: 14px 12px; }
+    .habit-dot { width: 28px; height: 28px; font-size: 10px; }
+    .habit-days { gap: 4px; flex: 1; justify-content: space-between; }
+    .habit-top { flex-wrap: wrap; gap: 6px; }
+
+    /* Goals */
+    .goal-card { padding: 14px 14px; }
+    .goal-title { font-size: 15px; }
+    .goal-pct-label { font-size: 22px; }
+    .pct-btn { width: 36px; height: 36px; font-size: 13px; }
+    .goal-footer { flex-wrap: wrap; gap: 8px; }
+    .goal-form .form-row { flex-direction: column; }
+
+    /* Finance */
+    .finance-summary { grid-template-columns: 1fr 1fr 1fr !important; gap: 6px; }
+    .finance-summary .card { padding: 10px 10px; }
+    .finance-summary .stat-big { font-size: 17px; }
+    .finance-summary .card-label { font-size: 9px; }
+    .finance-form { padding: 14px 14px; }
+    .finance-form .form-row { flex-direction: column; gap: 8px; }
+    .finance-form .form-row input,
+    .finance-form .form-row select,
+    .finance-form .form-row button { flex: unset; width: 100%; }
+    .tx-item { padding: 10px 10px; gap: 8px; }
+    .tx-amount { font-size: 12px; }
+
+    /* Journal */
+    .mood-row { gap: 4px; }
+    .mood-opt { padding: 10px 2px; border-radius: 10px; }
+    .mood-emoji { font-size: 20px; }
+    .mood-label { font-size: 8px; }
+    .journal-area { min-height: 120px; font-size: 15px; padding: 12px 14px; }
+
+    /* Work log */
+    .wl-day-hdr { font-size: 9px; letter-spacing: 0; padding: 4px 0; }
+    .wl-grid { gap: 3px; }
+    .wl-cell { border-radius: 7px; }
+    .wl-day-num { font-size: 11px; }
+    .wl-cell-icon { font-size: 10px; margin-top: 1px; }
+    .wl-dot { width: 4px; height: 4px; margin-top: 2px; }
+    #wl-stats { grid-template-columns: 1fr 1fr 1fr !important; gap: 8px; }
+    #wl-stats .card { padding: 10px 10px; }
+    #wl-stats .stat-big { font-size: 20px; }
+    #sec-worklog .page-header { flex-direction: column; gap: 10px; }
+    #sec-worklog .page-header > div:last-child { display: flex; justify-content: space-between; align-self: stretch; }
+    .wl-legend { gap: 10px; }
+    .wl-legend-item { font-size: 11px; }
+
+    /* Modals */
+    .modal { padding: 20px 16px; width: 96vw; max-width: 96vw; border-radius: 14px; }
+    .modal-btns { flex-wrap: wrap; }
+  }
+
+  @media (max-width: 400px) {
+    .main { padding: 10px 8px 84px; }
+    #home-stats .stat-big, #home-stats .tasks-count { font-size: 24px; }
+    .habit-dot { width: 24px; height: 24px; font-size: 9px; }
+    .finance-summary { grid-template-columns: 1fr 1fr !important; gap: 6px; }
+    .finance-summary .stat-big { font-size: 16px; }
+  }
 </style>
 </head>
 <body>
@@ -542,6 +687,23 @@
     </button>
   </div>
   <div class="sidebar-date" id="sidebar-date"></div>
+</nav>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <div class="bn-item active" id="bn-home"    onclick="showSection('home')"   ><span class="bn-icon">🏠</span>Home</div>
+    <div class="bn-item"        id="bn-tasks"   onclick="showSection('tasks')"  ><span class="bn-icon">✅</span>Tasks</div>
+    <div class="bn-item"        id="bn-habits"  onclick="showSection('habits')" ><span class="bn-icon">🔄</span>Habits</div>
+    <div class="bn-item"        id="bn-goals"   onclick="showSection('goals')"  ><span class="bn-icon">🎯</span>Goals</div>
+    <div class="bn-item"        id="bn-finance" onclick="showSection('finance')"><span class="bn-icon">💰</span>Finance</div>
+    <div class="bn-item"        id="bn-journal" onclick="showSection('journal')"><span class="bn-icon">📓</span>Journal</div>
+    <div class="bn-item"        id="bn-worklog" onclick="showSection('worklog')"><span class="bn-icon">💼</span>Work</div>
+    <div class="bn-sync"        onclick="openSyncModal()">
+      <span id="sync-dot-mob" style="width:8px;height:8px;border-radius:50%;background:#9A9690;display:block;margin:0 auto 3px;transition:background 0.3s"></span>
+      <span style="font-size:9px;font-weight:600;color:rgba(255,255,255,0.4)">Sync</span>
+    </div>
+  </div>
 </nav>
 
 <!-- SYNC MODAL -->
@@ -953,6 +1115,9 @@ function setSyncStatus(s, msg) {
   };
   dot.style.background = map[s][0];
   txt.textContent = map[s][1];
+  // also update mobile dot
+  const mobDot = document.getElementById('sync-dot-mob');
+  if (mobDot) mobDot.style.background = map[s][0];
 }
 
 // Push local data → GitHub
@@ -1049,10 +1214,13 @@ function uid() { return Math.random().toString(36).slice(2, 9); }
 function showSection(id) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.bn-item').forEach(n => n.classList.remove('active'));
   document.getElementById('sec-' + id).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n => {
     if (n.getAttribute('onclick') && n.getAttribute('onclick').includes(id)) n.classList.add('active');
   });
+  const bnEl = document.getElementById('bn-' + id);
+  if (bnEl) bnEl.classList.add('active');
   if (id === 'home') renderHome();
   if (id === 'tasks') renderTasks();
   if (id === 'habits') renderHabits();
