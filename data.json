@@ -31,6 +31,14 @@
       "cat": "Personal",
       "done": false,
       "created": "2026-04-28T21:53:37.988Z"
+    },
+    {
+      "id": "y5d4xtq",
+      "text": "replan work schedule",
+      "priority": "Medium",
+      "cat": "Work",
+      "done": false,
+      "created": "2026-04-29T08:13:32.206Z"
     }
   ],
   "habits": [
@@ -108,7 +116,12 @@
       "answered": true,
       "reported": false,
       "time": "2026-04-28T21:29:32.325Z"
+    },
+    "2026-04-29": {
+      "answered": true,
+      "reported": false,
+      "time": "2026-04-29T08:10:25.516Z"
     }
   },
-  "_saved": "2026-04-28T22:03:19.584Z"
+  "_saved": "2026-04-29T08:13:35.218Z"
 }
