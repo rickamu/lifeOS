@@ -39,6 +39,14 @@
       "cat": "Work",
       "done": false,
       "created": "2026-04-29T08:13:32.206Z"
+    },
+    {
+      "id": "93wysfl",
+      "text": "search for helium",
+      "priority": "Medium",
+      "cat": "Personal",
+      "done": false,
+      "created": "2026-04-29T08:17:52.200Z"
     }
   ],
   "habits": [
@@ -123,5 +131,5 @@
       "time": "2026-04-29T08:10:25.516Z"
     }
   },
-  "_saved": "2026-04-29T08:13:35.218Z"
+  "_saved": "2026-04-29T08:17:55.204Z"
 }
