@@ -47,6 +47,14 @@
       "cat": "Personal",
       "done": false,
       "created": "2026-04-29T08:17:52.200Z"
+    },
+    {
+      "id": "4q0c8q1",
+      "text": "buy new chair",
+      "priority": "Medium",
+      "cat": "Finance",
+      "done": false,
+      "created": "2026-04-29T08:18:05.412Z"
     }
   ],
   "habits": [
@@ -131,5 +139,5 @@
       "time": "2026-04-29T08:10:25.516Z"
     }
   },
-  "_saved": "2026-04-29T08:17:55.204Z"
+  "_saved": "2026-04-29T08:18:08.416Z"
 }
