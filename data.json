@@ -145,7 +145,16 @@
       "why": "Financial freedom"
     }
   ],
-  "finance": [],
+  "finance": [
+    {
+      "id": "1gtu149",
+      "name": "Salary",
+      "amount": 43600,
+      "type": "Income",
+      "cat": "Other",
+      "date": "2026-04-30"
+    }
+  ],
   "journal": [
     {
       "id": "sthejku",
@@ -179,5 +188,5 @@
       "time": "2026-04-30T04:45:56.746Z"
     }
   },
-  "_saved": "2026-04-30T04:50:10.281Z"
+  "_saved": "2026-04-30T14:29:10.330Z"
 }
