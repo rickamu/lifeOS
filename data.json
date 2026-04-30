@@ -103,6 +103,12 @@
       "name": "Read 20 mins",
       "emoji": "📚",
       "color": "var(--green)"
+    },
+    {
+      "id": "7it6vmn",
+      "name": "Apply for at least one job daily",
+      "emoji": "🏢",
+      "color": "var(--green)"
     }
   ],
   "goals": [
@@ -173,5 +179,5 @@
       "time": "2026-04-30T04:45:56.746Z"
     }
   },
-  "_saved": "2026-04-30T04:49:21.826Z"
+  "_saved": "2026-04-30T04:50:10.281Z"
 }
