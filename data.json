@@ -25,22 +25,6 @@
       "created": "2026-04-28T21:53:29.062Z"
     },
     {
-      "id": "8bm5v2x",
-      "text": "weeding",
-      "priority": "High",
-      "cat": "Personal",
-      "done": true,
-      "created": "2026-04-28T21:53:37.988Z"
-    },
-    {
-      "id": "y5d4xtq",
-      "text": "replan work schedule",
-      "priority": "Medium",
-      "cat": "Work",
-      "done": true,
-      "created": "2026-04-29T08:13:32.206Z"
-    },
-    {
       "id": "93wysfl",
       "text": "search for helium",
       "priority": "Medium",
@@ -63,14 +47,6 @@
       "cat": "Finance",
       "done": false,
       "created": "2026-04-29T08:18:20.938Z"
-    },
-    {
-      "id": "c30hcyl",
-      "text": "contact leah and paul to plan for reschedule",
-      "priority": "High",
-      "cat": "Work",
-      "done": true,
-      "created": "2026-04-29T08:18:44.673Z"
     }
   ],
   "habits": [
@@ -188,5 +164,5 @@
       "time": "2026-04-30T04:45:56.746Z"
     }
   },
-  "_saved": "2026-04-30T14:29:10.330Z"
+  "_saved": "2026-04-30T14:29:47.073Z"
 }
