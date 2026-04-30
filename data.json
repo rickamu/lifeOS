@@ -55,6 +55,14 @@
       "cat": "Errands",
       "done": false,
       "created": "2026-04-30T14:31:17.379Z"
+    },
+    {
+      "id": "wxpcajx",
+      "text": "Pay kareithi 500",
+      "priority": "High",
+      "cat": "Finance",
+      "done": false,
+      "created": "2026-04-30T14:31:53.646Z"
     }
   ],
   "habits": [
@@ -172,5 +180,5 @@
       "time": "2026-04-30T04:45:56.746Z"
     }
   },
-  "_saved": "2026-04-30T14:31:20.402Z"
+  "_saved": "2026-04-30T14:31:56.652Z"
 }
