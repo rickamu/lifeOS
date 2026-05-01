@@ -87,6 +87,14 @@
       "cat": "Personal",
       "done": false,
       "created": "2026-05-01T13:21:15.033Z"
+    },
+    {
+      "id": "d42v60e",
+      "text": "Update budget and spending",
+      "priority": "High",
+      "cat": "Personal",
+      "done": false,
+      "created": "2026-05-01T13:21:27.542Z"
     }
   ],
   "habits": [
@@ -209,5 +217,5 @@
       "time": "2026-05-01T13:10:04.653Z"
     }
   },
-  "_saved": "2026-05-01T13:21:18.036Z"
+  "_saved": "2026-05-01T13:21:30.556Z"
 }
