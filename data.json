@@ -33,44 +33,12 @@
       "created": "2026-04-29T08:17:52.200Z"
     },
     {
-      "id": "4q0c8q1",
-      "text": "buy new chair",
-      "priority": "Medium",
-      "cat": "Finance",
-      "done": false,
-      "created": "2026-04-29T08:18:05.412Z"
-    },
-    {
       "id": "0znnc6n",
       "text": "buy laundry basket",
       "priority": "Medium",
       "cat": "Finance",
       "done": false,
       "created": "2026-04-29T08:18:20.938Z"
-    },
-    {
-      "id": "b9gd8hn",
-      "text": "Get wheat floor, butternut, cofee and cakes",
-      "priority": "High",
-      "cat": "Errands",
-      "done": true,
-      "created": "2026-04-30T14:31:17.379Z"
-    },
-    {
-      "id": "wxpcajx",
-      "text": "Pay kareithi 500",
-      "priority": "High",
-      "cat": "Finance",
-      "done": true,
-      "created": "2026-04-30T14:31:53.646Z"
-    },
-    {
-      "id": "v4v9k2z",
-      "text": "Pay Muhoro $50",
-      "priority": "High",
-      "cat": "Finance",
-      "done": true,
-      "created": "2026-04-30T14:32:11.938Z"
     },
     {
       "id": "cf0jq2l",
@@ -225,5 +193,5 @@
       "time": "2026-05-01T13:10:04.653Z"
     }
   },
-  "_saved": "2026-05-01T13:22:20.757Z"
+  "_saved": "2026-05-01T13:22:26.294Z"
 }
