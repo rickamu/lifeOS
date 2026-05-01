@@ -95,6 +95,14 @@
       "cat": "Personal",
       "done": false,
       "created": "2026-05-01T13:21:27.542Z"
+    },
+    {
+      "id": "jey6zj1",
+      "text": "Go shopping",
+      "priority": "High",
+      "cat": "Errands",
+      "done": false,
+      "created": "2026-05-01T13:22:17.671Z"
     }
   ],
   "habits": [
@@ -217,5 +225,5 @@
       "time": "2026-05-01T13:10:04.653Z"
     }
   },
-  "_saved": "2026-05-01T13:21:30.556Z"
+  "_saved": "2026-05-01T13:22:20.757Z"
 }
