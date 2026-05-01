@@ -71,6 +71,14 @@
       "cat": "Finance",
       "done": true,
       "created": "2026-04-30T14:32:11.938Z"
+    },
+    {
+      "id": "cf0jq2l",
+      "text": "Search for a good pro firm",
+      "priority": "Medium",
+      "cat": "Personal",
+      "done": false,
+      "created": "2026-05-01T13:21:00.448Z"
     }
   ],
   "habits": [
@@ -193,5 +201,5 @@
       "time": "2026-05-01T13:10:04.653Z"
     }
   },
-  "_saved": "2026-05-01T13:20:42.306Z"
+  "_saved": "2026-05-01T13:21:03.452Z"
 }
