@@ -1043,13 +1043,14 @@ let journal   = STORE.get('ld_journal')   || [];
 let habitLogs = STORE.get('ld_habitlogs') || {};
 
 function save() {
-  STORE.set('ld_tasks',     tasks);
-  STORE.set('ld_habits',    habits);
-  STORE.set('ld_goals',     goals);
-  STORE.set('ld_finance',   finance);
-  STORE.set('ld_journal',   journal);
-  STORE.set('ld_habitlogs', habitLogs);
-  STORE.set('ld_worklogs',  workLogs);
+  STORE.set('ld_tasks',      tasks);
+  STORE.set('ld_habits',     habits);
+  STORE.set('ld_goals',      goals);
+  STORE.set('ld_finance',    finance);
+  STORE.set('ld_journal',    journal);
+  STORE.set('ld_habitlogs',  habitLogs);
+  STORE.set('ld_worklogs',   workLogs);
+  STORE.set('ld_last_saved', new Date().toISOString());
   scheduleSyncPush();
 }
 
@@ -1124,52 +1125,97 @@ function setSyncStatus(s, msg) {
 }
 
 // Push local data → GitHub
+// ── reliable base64 encode/decode for unicode content ──
+function b64Encode(str) {
+  return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (_, p1) =>
+    String.fromCharCode('0x' + p1)));
+}
+function b64Decode(str) {
+  return decodeURIComponent(Array.from(atob(str.replace(/\n/g,'')),
+    c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+}
+
+// Push local data → GitHub
 async function syncPush() {
   if (!GH.token || !GH.repo || !GH.owner) return;
   setSyncStatus('pushing');
   try {
-    const content = btoa(unescape(encodeURIComponent(JSON.stringify(allData(), null, 2))));
-    const body = { message: `Dashboard sync ${new Date().toISOString().slice(0,16)}`, content };
+    const payload = JSON.stringify(allData(), null, 2);
+    const content = b64Encode(payload);
+    const body = { message: `sync ${new Date().toISOString().slice(0,16)}`, content };
     if (ghFileSha) body.sha = ghFileSha;
-    const res = await fetch(ghApiUrl(), { method: 'PUT', headers: ghHeaders(), body: JSON.stringify(body) });
-    if (!res.ok) { const e = await res.json(); throw new Error(e.message); }
+    const res = await fetch(ghApiUrl(), {
+      method: 'PUT', headers: ghHeaders(), body: JSON.stringify(body)
+    });
+    if (res.status === 409) {
+      // SHA mismatch — fetch latest SHA and retry once
+      setSyncStatus('pulling');
+      const check = await fetch(ghApiUrl() + '?t=' + Date.now(), { headers: ghHeaders() });
+      if (check.ok) {
+        const cj = await check.json();
+        saveGhSha(cj.sha);
+        body.sha = cj.sha;
+        const retry = await fetch(ghApiUrl(), {
+          method: 'PUT', headers: ghHeaders(), body: JSON.stringify(body)
+        });
+        if (!retry.ok) throw new Error('Retry failed');
+        const rj = await retry.json();
+        saveGhSha(rj.content.sha);
+        setSyncStatus('ok');
+        return;
+      }
+    }
+    if (!res.ok) { const e = await res.json(); throw new Error(e.message || res.status); }
     const json = await res.json();
     saveGhSha(json.content.sha);
     setSyncStatus('ok');
   } catch(e) {
-    setSyncStatus('error', e.message.includes('409') ? 'Conflict — pull first' : 'Push failed');
+    setSyncStatus('error', 'Push failed — check token');
     console.error('Sync push error:', e);
   }
 }
 
-// Pull data ← GitHub
+// Pull data ← GitHub  (only overwrites if remote is NEWER than local)
 async function syncPull() {
   if (!GH.token || !GH.repo || !GH.owner) return;
   setSyncStatus('pulling');
   try {
     const res = await fetch(ghApiUrl() + '?t=' + Date.now(), { headers: ghHeaders() });
-    if (res.status === 404) { setSyncStatus('ok'); return; } // no file yet, that's fine
+    if (res.status === 404) {
+      // No remote file yet — push local data up immediately
+      setSyncStatus('idle');
+      await syncPush();
+      return;
+    }
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
     saveGhSha(json.sha);
-    const raw = decodeURIComponent(escape(atob(json.content.replace(/\n/g,''))));
-    loadAllData(JSON.parse(raw));
-    setSyncStatus('ok');
-    // re-render everything
-    renderHome(); renderTasks(); renderHabits(); renderGoals(); renderFinance(); renderJournal();
-    // restore journal textarea
-    const te = journal.find(j => j.date === todayKey());
-    if (te) document.getElementById('journal-text').value = te.text || '';
+    const raw = b64Decode(json.content);
+    const remote = JSON.parse(raw);
+    const localSaved  = STORE.get('ld_last_saved') || '1970-01-01T00:00:00Z';
+    const remoteSaved = remote._saved || '1970-01-01T00:00:00Z';
+    if (remoteSaved > localSaved) {
+      // Remote is newer — load it
+      loadAllData(remote);
+      setSyncStatus('ok');
+      renderHome(); renderTasks(); renderHabits(); renderGoals(); renderFinance(); renderJournal();
+      const te = journal.find(j => j.date === todayKey());
+      if (te) document.getElementById('journal-text').value = te.text || '';
+    } else {
+      // Local is newer or same — push our version up
+      setSyncStatus('ok');
+      await syncPush();
+    }
   } catch(e) {
     setSyncStatus('error', 'Pull failed');
     console.error('Sync pull error:', e);
   }
 }
 
-// Debounced push — waits 3s after last change before pushing
+// Debounced push — waits 2s after last change
 function scheduleSyncPush() {
   clearTimeout(syncTimer);
-  syncTimer = setTimeout(syncPush, 3000);
+  syncTimer = setTimeout(syncPush, 2000);
 }
 
 // ── SYNC SETTINGS MODAL ──
@@ -2171,6 +2217,24 @@ if (GH.token && GH.repo && GH.owner) {
 
 document.getElementById('sync-modal').addEventListener('click', e => {
   if (e.target === document.getElementById('sync-modal')) closeSyncModal();
+});
+
+// Push immediately when user leaves or hides the tab (catches refresh/close)
+window.addEventListener('beforeunload', () => {
+  clearTimeout(syncTimer);
+  if (GH.token && GH.repo && GH.owner) syncPush();
+});
+
+// Also push when tab becomes hidden (mobile background switch)
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') {
+    clearTimeout(syncTimer);
+    if (GH.token && GH.repo && GH.owner) syncPush();
+  }
+  if (document.visibilityState === 'visible') {
+    // Pull when coming back to the tab in case another device changed something
+    if (GH.token && GH.repo && GH.owner) syncPull();
+  }
 });
 </script>
 </body>
