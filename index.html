@@ -2033,96 +2033,169 @@ function wlShowDetail(key) {
   const log   = workLogs[key];
   const today = todayKey();
 
-  // Future days — ignore
   if (key > today) { panel.style.display = 'none'; return; }
 
   const d = new Date(key + 'T12:00:00');
   const dateLabel = d.toLocaleDateString('en-KE', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
 
-  // ── NOT YET LOGGED — show quick-log form ──
-  if (!log || !log.answered) {
+  // ── LOGGED — show detail card with Edit + Delete ──
+  if (log && log.answered) {
+    const isWorked = log.reported;
     panel.style.display = 'block';
     panel.scrollIntoView({ behavior:'smooth', block:'nearest' });
     panel.innerHTML = `
-      <div class="wl-detail" style="border:1.5px dashed var(--amber)">
-        <div class="wl-detail-header" style="margin-bottom:14px">
-          <div class="wl-detail-badge" style="background:#FFF8E7">📅</div>
+      <div class="wl-detail" style="border:1px solid ${isWorked ? '#A8DFC8' : '#F5C0B5'}">
+        <div class="wl-detail-header">
+          <div class="wl-detail-badge" style="background:${isWorked ? '#EDFAF4' : '#FEF0EE'}">
+            ${isWorked ? '💼' : '🏖️'}
+          </div>
           <div>
             <div class="wl-detail-date">${dateLabel}</div>
-            <div class="wl-detail-status" style="color:var(--amber)">Not logged — mark this day</div>
+            <div class="wl-detail-status" style="color:${isWorked ? 'var(--green)' : 'var(--coral)'}">
+              ${isWorked ? '✓ Reported to work' : '✗ Day off'}
+            </div>
           </div>
           <button onclick="document.getElementById('wl-detail-panel').style.display='none'"
-            style="margin-left:auto;background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;padding:4px">×</button>
+            style="margin-left:auto;background:none;border:none;font-size:22px;color:var(--muted);cursor:pointer;padding:4px;line-height:1">×</button>
         </div>
-        <div style="display:flex;gap:10px;margin-bottom:14px">
-          <button id="wl-qbtn-yes" data-selected=""
-            onclick="wlQuickSelect('${key}', true)"
-            style="flex:1;padding:12px;border-radius:10px;border:2px solid var(--border);
-                   background:transparent;font-family:'DM Sans',sans-serif;font-size:14px;
-                   font-weight:600;cursor:pointer;color:var(--sub);transition:all 0.15s">
-            💼 Worked
+
+        ${isWorked && log.summary
+          ? `<div class="card-label" style="margin-bottom:6px">What was done</div>
+             <div class="wl-detail-body">${log.summary}</div>`
+          : `<div class="wl-detail-empty">${isWorked ? 'No activities recorded.' : 'Enjoy your day off! 🌴'}</div>`
+        }
+
+        ${log.time ? `<div style="font-size:11px;color:var(--muted);margin-top:10px">Logged at ${new Date(log.time).toLocaleTimeString('en-KE',{hour:'2-digit',minute:'2-digit'})}</div>` : ''}
+
+        <div style="display:flex;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
+          <button onclick="wlOpenForm('${key}')"
+            style="flex:1;padding:10px;border-radius:10px;border:1.5px solid var(--border);
+                   background:transparent;font-family:'DM Sans',sans-serif;font-size:13px;
+                   font-weight:600;color:var(--sub);cursor:pointer;transition:all 0.15s"
+            onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--purple)'"
+            onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--sub)'">
+            ✎ Edit entry
           </button>
-          <button id="wl-qbtn-no" data-selected=""
-            onclick="wlQuickSelect('${key}', false)"
-            style="flex:1;padding:12px;border-radius:10px;border:2px solid var(--border);
-                   background:transparent;font-family:'DM Sans',sans-serif;font-size:14px;
-                   font-weight:600;cursor:pointer;color:var(--sub);transition:all 0.15s">
-            🏖️ Day Off
-          </button>
-        </div>
-        <div id="wl-quick-log-area" style="display:none">
-          <div style="font-size:11px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px">What did you do?</div>
-          <textarea id="wl-quick-textarea"
-            style="width:100%;min-height:90px;padding:12px 14px;border:1.5px solid var(--border);
-                   border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;
-                   line-height:1.6;color:var(--text);background:var(--bg);outline:none;resize:none;"
-            placeholder="Describe what you worked on…"></textarea>
-        </div>
-        <div style="display:flex;justify-content:flex-end;margin-top:12px">
-          <button onclick="wlQuickSave('${key}')"
-            style="padding:10px 22px;background:var(--amber);color:#fff;border:none;
-                   border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;
-                   font-weight:600;cursor:pointer;">
-            Save Day ✓
+          <button onclick="wlConfirmDelete('${key}')"
+            style="flex:1;padding:10px;border-radius:10px;border:1.5px solid #FADDD8;
+                   background:#FEF5F4;font-family:'DM Sans',sans-serif;font-size:13px;
+                   font-weight:600;color:var(--coral);cursor:pointer;transition:all 0.15s"
+            onmouseover="this.style.background='#FADDD8'"
+            onmouseout="this.style.background='#FEF5F4'">
+            🗑 Delete entry
           </button>
         </div>
       </div>`;
     return;
   }
 
-  // ── ALREADY LOGGED — show detail + edit button ──
-  const isWorked = log.reported;
+  // ── NOT LOGGED — show add form ──
+  wlOpenForm(key);
+}
+
+// Opens the log form — used for both new entries and editing existing ones
+function wlOpenForm(key) {
+  const panel = document.getElementById('wl-detail-panel');
+  const existing = workLogs[key];
+  const d = new Date(key + 'T12:00:00');
+  const dateLabel = d.toLocaleDateString('en-KE', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  const isEdit = existing && existing.answered;
+  const prefillSummary = isEdit && existing.reported ? (existing.summary || '') : '';
+  const preWorked = isEdit ? existing.reported : null;
+
   panel.style.display = 'block';
   panel.scrollIntoView({ behavior:'smooth', block:'nearest' });
   panel.innerHTML = `
-    <div class="wl-detail">
-      <div class="wl-detail-header">
-        <div class="wl-detail-badge" style="background:${isWorked ? '#EDFAF4' : '#FEF0EE'}">
-          ${isWorked ? '💼' : '🏖️'}
-        </div>
+    <div class="wl-detail" style="border:1.5px dashed var(--amber)">
+      <div class="wl-detail-header" style="margin-bottom:14px">
+        <div class="wl-detail-badge" style="background:#FFF8E7">${isEdit ? '✎' : '📅'}</div>
         <div>
           <div class="wl-detail-date">${dateLabel}</div>
-          <div class="wl-detail-status" style="color:${isWorked ? 'var(--green)' : 'var(--coral)'}">
-            ${isWorked ? '✓ Reported to work' : '✗ Day off'}
-          </div>
+          <div class="wl-detail-status" style="color:var(--amber)">${isEdit ? 'Editing entry' : 'Add work log'}</div>
         </div>
-        <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-          <button onclick="wlEditDay('${key}')"
-            style="background:none;border:1.5px solid var(--border);border-radius:8px;
-                   font-size:12px;font-weight:600;color:var(--sub);cursor:pointer;padding:5px 10px">
-            ✎ Edit
-          </button>
-          <button onclick="document.getElementById('wl-detail-panel').style.display='none'"
-            style="background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;padding:4px">×</button>
-        </div>
+        <button onclick="${isEdit ? `wlShowDetail('${key}')` : `document.getElementById('wl-detail-panel').style.display='none'`}"
+          style="margin-left:auto;background:none;border:none;font-size:22px;color:var(--muted);cursor:pointer;padding:4px;line-height:1">×</button>
       </div>
-      ${isWorked && log.summary
-        ? `<div class="card-label" style="margin-bottom:8px">What was done</div>
-           <div class="wl-detail-body">${log.summary}</div>`
-        : `<div class="wl-detail-empty">${isWorked ? 'No activities recorded.' : 'Enjoy your day off! 🌴'}</div>`
-      }
-      ${log.time ? `<div style="margin-top:14px;font-size:11px;color:var(--muted)">Logged at ${new Date(log.time).toLocaleTimeString('en-KE',{hour:'2-digit',minute:'2-digit'})}</div>` : ''}
+
+      <div style="display:flex;gap:10px;margin-bottom:14px">
+        <button id="wl-qbtn-yes" data-selected="${preWorked === true ? 'yes' : ''}"
+          onclick="wlQuickSelect('${key}', true)"
+          style="flex:1;padding:12px;border-radius:10px;border:2px solid ${preWorked === true ? 'var(--green)' : 'var(--border)'};
+                 background:${preWorked === true ? '#EDFAF4' : 'transparent'};
+                 font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;
+                 cursor:pointer;color:${preWorked === true ? 'var(--green)' : 'var(--sub)'};transition:all 0.15s">
+          💼 Worked
+        </button>
+        <button id="wl-qbtn-no" data-selected="${preWorked === false ? 'yes' : ''}"
+          onclick="wlQuickSelect('${key}', false)"
+          style="flex:1;padding:12px;border-radius:10px;border:2px solid ${preWorked === false ? 'var(--coral)' : 'var(--border)'};
+                 background:${preWorked === false ? '#FEF0EE' : 'transparent'};
+                 font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;
+                 cursor:pointer;color:${preWorked === false ? 'var(--coral)' : 'var(--sub)'};transition:all 0.15s">
+          🏖️ Day Off
+        </button>
+      </div>
+
+      <div id="wl-quick-log-area" style="display:${preWorked === true ? 'block' : 'none'}">
+        <div style="font-size:11px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px">What did you do?</div>
+        <textarea id="wl-quick-textarea"
+          style="width:100%;min-height:90px;padding:12px 14px;border:1.5px solid var(--border);
+                 border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;
+                 line-height:1.6;color:var(--text);background:var(--bg);outline:none;resize:none;"
+          placeholder="Describe what you worked on…">${prefillSummary}</textarea>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:14px">
+        ${isEdit ? `<button onclick="wlShowDetail('${key}')"
+          style="padding:10px 18px;border-radius:10px;border:1.5px solid var(--border);
+                 background:transparent;font-family:'DM Sans',sans-serif;font-size:13px;
+                 font-weight:600;color:var(--sub);cursor:pointer">Cancel</button>` : ''}
+        <button onclick="wlQuickSave('${key}')"
+          style="padding:10px 22px;background:var(--amber);color:#fff;border:none;
+                 border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;
+                 font-weight:600;cursor:pointer;">
+          ${isEdit ? 'Update Day ✓' : 'Save Day ✓'}
+        </button>
+      </div>
     </div>`;
+}
+
+// Confirm before deleting
+function wlConfirmDelete(key) {
+  const panel = document.getElementById('wl-detail-panel');
+  const d = new Date(key + 'T12:00:00');
+  const dateLabel = d.toLocaleDateString('en-KE', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  panel.innerHTML = `
+    <div class="wl-detail" style="border:1.5px solid var(--coral)">
+      <div style="text-align:center;padding:10px 0 16px">
+        <div style="font-size:36px;margin-bottom:10px">🗑️</div>
+        <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:600;margin-bottom:6px">Delete this entry?</div>
+        <div style="font-size:13px;color:var(--muted)">${dateLabel}</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:4px">This cannot be undone.</div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button onclick="wlShowDetail('${key}')"
+          style="flex:1;padding:11px;border-radius:10px;border:1.5px solid var(--border);
+                 background:transparent;font-family:'DM Sans',sans-serif;font-size:14px;
+                 font-weight:600;color:var(--sub);cursor:pointer">
+          Cancel
+        </button>
+        <button onclick="wlDeleteDay('${key}')"
+          style="flex:1;padding:11px;border-radius:10px;border:none;
+                 background:var(--coral);color:#fff;font-family:'DM Sans',sans-serif;
+                 font-size:14px;font-weight:600;cursor:pointer">
+          Yes, delete
+        </button>
+      </div>
+    </div>`;
+}
+
+function wlDeleteDay(key) {
+  delete workLogs[key];
+  save();
+  renderWorkLog();
+  renderHome();
+  document.getElementById('wl-detail-panel').style.display = 'none';
 }
 
 function wlQuickSelect(key, worked) {
@@ -2131,36 +2204,23 @@ function wlQuickSelect(key, worked) {
   const logArea = document.getElementById('wl-quick-log-area');
   if (!yesBtn || !noBtn) return;
   if (worked) {
-    yesBtn.style.background   = '#EDFAF4';
-    yesBtn.style.borderColor  = 'var(--green)';
-    yesBtn.style.color        = 'var(--green)';
-    yesBtn.dataset.selected   = 'yes';
-    noBtn.style.background    = 'transparent';
-    noBtn.style.borderColor   = 'var(--border)';
-    noBtn.style.color         = 'var(--sub)';
-    noBtn.dataset.selected    = '';
-    logArea.style.display     = 'block';
+    yesBtn.style.background  = '#EDFAF4'; yesBtn.style.borderColor = 'var(--green)'; yesBtn.style.color = 'var(--green)'; yesBtn.dataset.selected = 'yes';
+    noBtn.style.background   = 'transparent'; noBtn.style.borderColor = 'var(--border)'; noBtn.style.color = 'var(--sub)'; noBtn.dataset.selected = '';
+    logArea.style.display = 'block';
     document.getElementById('wl-quick-textarea').focus();
   } else {
-    noBtn.style.background    = '#FEF0EE';
-    noBtn.style.borderColor   = 'var(--coral)';
-    noBtn.style.color         = 'var(--coral)';
-    noBtn.dataset.selected    = 'yes';
-    yesBtn.style.background   = 'transparent';
-    yesBtn.style.borderColor  = 'var(--border)';
-    yesBtn.style.color        = 'var(--sub)';
-    yesBtn.dataset.selected   = '';
-    logArea.style.display     = 'none';
+    noBtn.style.background   = '#FEF0EE'; noBtn.style.borderColor = 'var(--coral)'; noBtn.style.color = 'var(--coral)'; noBtn.dataset.selected = 'yes';
+    yesBtn.style.background  = 'transparent'; yesBtn.style.borderColor = 'var(--border)'; yesBtn.style.color = 'var(--sub)'; yesBtn.dataset.selected = '';
+    logArea.style.display = 'none';
   }
 }
 
 function wlQuickSave(key) {
-  const yesBtn  = document.getElementById('wl-qbtn-yes');
-  const noBtn   = document.getElementById('wl-qbtn-no');
+  const yesBtn = document.getElementById('wl-qbtn-yes');
+  const noBtn  = document.getElementById('wl-qbtn-no');
   const workedSelected = yesBtn && yesBtn.dataset.selected === 'yes';
   const offSelected    = noBtn  && noBtn.dataset.selected  === 'yes';
   if (!workedSelected && !offSelected) {
-    // Flash amber border as hint — nothing selected yet
     if (yesBtn) { yesBtn.style.borderColor = 'var(--amber)'; setTimeout(() => yesBtn.style.borderColor = 'var(--border)', 800); }
     if (noBtn)  { noBtn.style.borderColor  = 'var(--amber)'; setTimeout(() => noBtn.style.borderColor  = 'var(--border)', 800); }
     return;
@@ -2168,15 +2228,9 @@ function wlQuickSave(key) {
   const textarea = document.getElementById('wl-quick-textarea');
   const summary  = workedSelected && textarea ? textarea.value.trim() : '';
   workLogs[key]  = { answered:true, reported:workedSelected, summary, time:new Date().toISOString() };
-  save();           // saves workLogs to localStorage AND pushes to GitHub
+  save();
   renderWorkLog();
   renderHome();
-  wlShowDetail(key);
-}
-
-function wlEditDay(key) {
-  delete workLogs[key];
-  save();           // sync the deletion too
   wlShowDetail(key);
 }
 
